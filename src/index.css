@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@theme {
+  --color-unitec-blue: #004a99;
+  --color-unitec-red: #e31e24;
+  --color-unitec-gray: #f7f7f7;
+  --color-unitec-dark: #1a1a1a;
+}

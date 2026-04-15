@@ -1,0 +1,5 @@
+{
+  "name": "Sistema de Gestión de Inventario",
+  "description": "Sistema de control de inventario para equipo, insumos y herramientas con revisiones periódicas y códigos QR.",
+  "requestFramePermissions": ["camera"]
+}

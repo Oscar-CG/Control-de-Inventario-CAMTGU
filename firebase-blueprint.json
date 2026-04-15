@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "Item": {
+      "title": "Inventory Item",
+      "description": "A supply, equipment, or tool in the inventory",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Nombre del insumo, equipo o herramienta" },
+        "brand": { "type": "string", "description": "Marca" },
+        "model": { "type": "string", "description": "Modelo" },
+        "serialNumber": { "type": "string", "description": "Número de serie" },
+        "lab": { "type": "string", "description": "ID del laboratorio asignado" },
+        "location": { "type": "string", "description": "Localización específica" },
+        "description": { "type": "string", "description": "Descripción detallada" },
+        "observations": { "type": "string", "description": "Observaciones adicionales" },
+        "tag": { "type": "string", "description": "Etiqueta de identificación" },
+        "qrCode": { "type": "string", "description": "Código QR para identificación rápida" },
+        "imageUrl": { "type": "string", "description": "URL de la imagen del objeto" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "lab", "tag"]
+    },
+    "Lab": {
+      "title": "Laboratory",
+      "description": "A laboratory or area where items are stored",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Nombre del laboratorio" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name"]
+    },
+    "User": {
+      "title": "App User",
+      "description": "User profile with role information",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "displayName": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    },
+    "Review": {
+      "title": "Inventory Review",
+      "description": "A periodic check of inventory items in a specific lab",
+      "type": "object",
+      "properties": {
+        "lab": { "type": "string", "description": "Laboratorio siendo revisado" },
+        "date": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["pending", "completed"] },
+        "notes": { "type": "string" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["lab", "date", "status"]
+    },
+    "ReviewItem": {
+      "title": "Review Item Status",
+      "description": "The status of a specific item during a review",
+      "type": "object",
+      "properties": {
+        "reviewId": { "type": "string" },
+        "itemId": { "type": "string" },
+        "status": { "type": "string", "enum": ["found", "missing", "damaged"] },
+        "notes": { "type": "string" },
+        "checkedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reviewId", "itemId", "status"]
+    }
+  },
+  "firestore": {
+    "/items/{itemId}": {
+      "schema": "Item",
+      "description": "Collection of inventory items"
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Collection of inventory review sessions"
+    },
+    "/reviews/{reviewId}/items/{reviewItemId}": {
+      "schema": "ReviewItem",
+      "description": "Status of items within a specific review"
+    }
+  }
+}

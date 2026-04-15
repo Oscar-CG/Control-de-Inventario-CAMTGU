@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+        request.auth.token.email == "cam.unitec@gmail.com"
+      );
+    }
+
+    function isUser() {
+      return isAuthenticated() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'user') || isAdmin()
+      );
+    }
+
+    function isValidItem(data) {
+      return data.name is string && data.name.size() > 0 &&
+             data.lab is string && data.lab.size() > 0 &&
+             data.tag is string && data.tag.size() > 0 &&
+             data.category is string && data.category in ['Equipo', 'Insumos', 'Herramientas'] &&
+             data.brand is string && data.brand.size() > 0 &&
+             data.model is string && data.model.size() > 0 &&
+             data.serialNumber is string && data.serialNumber.size() > 0 &&
+             data.location is string && data.location.size() > 0 &&
+             data.description is string && data.description.size() > 0 &&
+             data.observations is string && data.observations.size() > 0 &&
+             data.imageUrl is string && data.imageUrl.size() > 0;
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAdmin();
+    }
+
+    match /labs/{labId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /items/{itemId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin() && isValidItem(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /test_connection/{docId} {
+      allow write: if isAuthenticated();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if isAuthenticated();
+      allow write: if isUser();
+      
+      match /items/{reviewItemId} {
+        allow read: if isAuthenticated();
+        allow write: if isUser();
+      }
+    }
+  }
+}
